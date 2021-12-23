@@ -1,4 +1,4 @@
-function createBubble () {
+function createBubble (level: number) {
     bubble = sprites.create(img`
         . . . . . b b b b b b . . . . . 
         . . . b b 9 9 9 9 9 9 b b . . . 
@@ -17,6 +17,7 @@ function createBubble () {
         . . . b b 5 5 5 5 5 5 b b . . . 
         . . . . . b b b b b b . . . . . 
         `, SpriteKind.Food)
+    newX = level * 0
     bubble.setPosition(randint(10, 150), randint(10, 110))
 }
 sprites.onOverlap(SpriteKind.Player, SpriteKind.Food, function (sprite, otherSprite) {
@@ -24,6 +25,7 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Food, function (sprite, otherSpr
     bubblePopped += -1
     info.setScore(bubblePopped)
 })
+let newX = 0
 let bubble: Sprite = null
 let bubblePopped = 0
 tiles.setTilemap(tilemap`level0`)
@@ -49,10 +51,9 @@ controller.moveSprite(bird, 100, 100)
 bird.setPosition(10, 10)
 scene.cameraFollowSprite(bird)
 for (let index = 0; index <= 4; index++) {
-    createBubble()
+    createBubble(1)
     bubblePopped = index
 }
-info.setScore(bubblePopped)
 animation.runImageAnimation(
 bird,
 [img`
@@ -162,9 +163,14 @@ bird,
 true
 )
 game.onUpdate(function () {
-    if (bird.isHittingTile(CollisionDirection.Right)) {
+    if (bird.isHittingTile(CollisionDirection.Right) && info.score() == 0) {
         for (let index = 0; index <= 7; index++) {
             tiles.setWallAt(tiles.getTileLocation(9, index), false)
         }
+        for (let index = 0; index <= 5; index++) {
+            createBubble(1)
+            bubblePopped = index
+        }
     }
+    info.setScore(sprites.allOfKind(SpriteKind.Food).length)
 })
